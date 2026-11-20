@@ -42,6 +42,7 @@ class MainActivity : Activity() {
 
             webView.settings.javaScriptEnabled = true
             webView.settings.domStorageEnabled = true
+webView.settings.textZoom = 75
             webView.settings.useWideViewPort = true
             webView.settings.loadWithOverviewMode = true
 
