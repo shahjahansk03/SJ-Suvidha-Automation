@@ -40,9 +40,24 @@ class MainActivity : Activity() {
 
             webView = WebView(this)
 
-            webView.settings.javaScriptEnabled = true
-            webView.settings.domStorageEnabled = true
-webView.settings.textZoom = 75
+            webView.settings.apply {
+    javaScriptEnabled = true
+    domStorageEnabled = true
+
+    // Enable desktop website
+    useWideViewPort = true
+    loadWithOverviewMode = true
+    setSupportZoom(true)
+    builtInZoomControls = true
+    displayZoomControls = false
+
+    // Request desktop website
+    userAgentString = userAgentString.replace(
+        "Mobile",
+        ""
+    )
+}
+            webView.settings.textZoom = 75
             webView.settings.useWideViewPort = true
             webView.settings.loadWithOverviewMode = true
 
