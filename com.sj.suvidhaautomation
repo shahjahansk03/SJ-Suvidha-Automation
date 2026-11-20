@@ -1,0 +1,129 @@
+package com.sj.suvidhaautomation
+
+import android.app.Activity
+import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.graphics.Color
+
+class MainActivity : Activity() {
+
+    private lateinit var webView: WebView
+    private lateinit var status: TextView
+
+    private val portalUrl =
+        "https://suvidha-mp.wb.gov.in/"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setBackgroundColor(Color.WHITE)
+
+        val title = TextView(this)
+        title.text = "SJ SUVIDHA AUTOMATION"
+        title.textSize = 21f
+        title.setTextColor(Color.WHITE)
+        title.setPadding(18, 22, 18, 22)
+        title.setBackgroundColor(Color.rgb(25, 55, 100))
+        layout.addView(title)
+
+        status = TextView(this)
+        status.text = "Ready to connect"
+        status.textSize = 14f
+        status.setPadding(12, 12, 12, 12)
+        layout.addView(status)
+
+        val buttons = LinearLayout(this)
+        buttons.orientation = LinearLayout.HORIZONTAL
+
+        fun addButton(label: String, action: () -> Unit) {
+            val button = Button(this)
+            button.text = label
+            button.setOnClickListener { action() }
+            buttons.addView(
+                button,
+                LinearLayout.LayoutParams(
+                    0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    1f
+                )
+            )
+        }
+
+        addButton("OPEN PORTAL") {
+            webView.loadUrl(portalUrl)
+        }
+
+        addButton("BACK") {
+            if (webView.canGoBack()) webView.goBack()
+        }
+
+        addButton("RELOAD") {
+            webView.reload()
+        }
+
+        layout.addView(buttons)
+
+        webView = WebView(this)
+
+        webView.settings.javaScriptEnabled = true
+        webView.settings.domStorageEnabled = true
+        webView.settings.allowFileAccess = false
+        webView.settings.allowContentAccess = false
+
+        webView.webChromeClient = WebChromeClient()
+
+        webView.webViewClient = object : WebViewClient() {
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
+                val host = request.url.host ?: ""
+                return host != "suvidha-mp.wb.gov.in"
+            }
+
+            override fun onPageFinished(
+                view: WebView,
+                url: String
+            ) {
+                status.text = "Portal loaded successfully"
+            }
+        }
+
+        layout.addView(
+            webView,
+            LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+            )
+        )
+
+        setContentView(layout)
+    }
+
+    override fun onBackPressed() {
+        if (::webView.isInitialized && webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onDestroy() {
+        if (::webView.isInitialized) {
+            webView.destroy()
+        }
+        super.onDestroy()
+    }
+}
